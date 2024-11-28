@@ -1,6 +1,7 @@
 package com.jdangar.pokemonreview.controllers;
 
 import com.jdangar.pokemonreview.dto.PokemonDto;
+import com.jdangar.pokemonreview.dto.PokemonResponse;
 import com.jdangar.pokemonreview.models.Pokemon;
 import com.jdangar.pokemonreview.service.PokemonService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +23,16 @@ public class PokemonController {
     }
 
     @GetMapping("pokemon")
-    public ResponseEntity<List<PokemonDto>> getPokemons() {
-        return ResponseEntity.ok(pokemonService.getAllPokemon());
+    public ResponseEntity<PokemonResponse> getAllPokemon(
+            @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
+            @RequestParam(value = "pageSize", defaultValue = "10", required = false) int pageSize
+    ) {
+        return ResponseEntity.ok(pokemonService.getAllPokemon(pageNo, pageSize));
     }
 
     @GetMapping("pokemon/{id}")
-    public ResponseEntity<Pokemon> getPokemon(@PathVariable int id) {
-        return ResponseEntity.ok(new Pokemon(id, "Pikachu", "Fire"));
+    public ResponseEntity<PokemonDto> getPokemon(@PathVariable int id) {
+        return ResponseEntity.ok(pokemonService.getPokemonById(id));
     }
 
     @PostMapping("pokemon/create")
@@ -38,15 +42,13 @@ public class PokemonController {
     }
 
     @PutMapping("pokemon/{id}/update")
-    public ResponseEntity<Pokemon> updatePokemon(@RequestBody Pokemon pokemon, @PathVariable int id) {
-        System.out.println(pokemon.getName());
-        System.out.println(pokemon.getType());
-        return ResponseEntity.ok(pokemon);
+    public ResponseEntity<PokemonDto> updatePokemon(@RequestBody PokemonDto pokemonDto, @PathVariable int id) {
+        return ResponseEntity.ok(pokemonService.updatePokemon(pokemonDto,id));
     }
 
     @DeleteMapping("pokemon/{id}/delete")
     public ResponseEntity<String> deletePokemon(@PathVariable int id) {
-        System.out.println(id);
+        pokemonService.deletePokemon(id);
         return ResponseEntity.ok("Pokemon Deleted successfully.");
     }
 }
